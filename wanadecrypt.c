@@ -11,8 +11,9 @@
 
 	Licence : https://creativecommons.org/licenses/by/4.0/
 */
-#include <Windows.h>
-#include <Shlwapi.h>
+#include <windows.h>
+#include <wincrypt.h>
+#include <shlwapi.h>
 #include <stdio.h>
 
 #define RSA_2048_ENC	256 // 2048 / 8
@@ -46,8 +47,8 @@ typedef struct _DEC_PRIV_KEY {
 } DEC_PRIV_KEY, *PDEC_PRIV_KEY;
 
 BOOL SIMPLE_kull_m_crypto_hkey(HCRYPTPROV hProv, ALG_ID calgid, LPCVOID key, DWORD keyLen, DWORD flags, HCRYPTKEY *hKey);
-BOOL SIMPLE_kull_m_file_readData(PCWCHAR fileName, PBYTE * data, PDWORD lenght);
-BOOL SIMPLE_kull_m_file_writeData(PCWCHAR fileName, LPCVOID data, DWORD lenght);
+BOOL SIMPLE_kull_m_file_readData(PWCHAR fileName, PBYTE * data, PDWORD lenght);
+BOOL SIMPLE_kull_m_file_writeData(PWCHAR fileName, LPCVOID data, DWORD lenght);
 void decryptFileWithKey(HCRYPTPROV hProv, HCRYPTKEY hUserRsaKey, int argc, wchar_t * argv[]);
 
 int wmain(int argc, wchar_t * argv[])
@@ -211,13 +212,13 @@ BOOL SIMPLE_kull_m_crypto_hkey(HCRYPTPROV hProv, ALG_ID calgid, LPCVOID key, DWO
 		keyBlob->Header.aiKeyAlg = calgid;
 		keyBlob->dwKeyLen = keyLen;
 		RtlCopyMemory((PBYTE) keyBlob + sizeof(GENERICKEY_BLOB), key, keyBlob->dwKeyLen);
-		status = CryptImportKey(hProv, (LPCBYTE) keyBlob, szBlob, 0, flags, hKey);
+		status = CryptImportKey(hProv, (LPBYTE) keyBlob, szBlob, 0, flags, hKey);
 		LocalFree(keyBlob);
 	}
 	return status;
 }
 
-BOOL SIMPLE_kull_m_file_readData(PCWCHAR fileName, PBYTE * data, PDWORD lenght)
+BOOL SIMPLE_kull_m_file_readData(PWCHAR fileName, PBYTE * data, PDWORD lenght)
 {
 	BOOL reussite = FALSE;
 	DWORD dwBytesReaded;
@@ -240,7 +241,7 @@ BOOL SIMPLE_kull_m_file_readData(PCWCHAR fileName, PBYTE * data, PDWORD lenght)
 	return reussite;
 }
 
-BOOL SIMPLE_kull_m_file_writeData(PCWCHAR fileName, LPCVOID data, DWORD lenght)
+BOOL SIMPLE_kull_m_file_writeData(PWCHAR fileName, LPCVOID data, DWORD lenght)
 {
 	BOOL reussite = FALSE;
 	DWORD dwBytesWritten = 0;
